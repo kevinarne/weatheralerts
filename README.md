@@ -4,3 +4,4 @@ Quick and dirty script to give me a heads up that I need to prepare for weather 
 # Modules to import
 * python-decouple
 * requests
+* plyer

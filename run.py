@@ -1,5 +1,6 @@
 import requests
 from decouple import config
+from plyer import notification
 
 if __name__ == "__main__":
     # Request two days of data (today and tomorrow) from openweather at the location used in environmental variables.
@@ -12,4 +13,9 @@ if __name__ == "__main__":
         )
     # Access the second day temperatures and the associated maximum
     maxtemp = response.json()['daily'][1]['temp']['max']
-    print(f"Tomorrow's max temp is {maxtemp}F")
+
+    notification.notify(
+        title="Weather Alert",
+        message=f"Tomorrow's max temp is {maxtemp}F",
+        timeout=3600
+    )
