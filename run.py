@@ -1,7 +1,8 @@
 import requests
 from decouple import config
 from plyer import notification
-import smtplib, ssl
+import smtplib
+import ssl
 import datetime
 
 port = 465
@@ -13,14 +14,15 @@ if __name__ == "__main__":
         f"?lat={config('LATITUDE')}" +
         f"&lon={config('LONGITUDE')}" +
         "&units=imperial" +
-        "&cnt=2" +
+        "&cnt=2" + # Only need today and tomorrow, hence count = 2
         f"&APPID={config('OPEN_WEATHER_API')}"
         )
-    # Access the second day temperatures and the associated maximum
+
+    # Access the second day (index 1) temperatures and the associated maximum
     maxtemp = weather_response.json()['daily'][1]['temp']['max']
 
     suggestions = ""
-    if maxtemp > 72:
+    if maxtemp > config('COMFY_TEMP'):
         suggestions += "Make sure to open the windows and run the fans.\n"
 
     air_response = requests.get(
@@ -34,7 +36,7 @@ if __name__ == "__main__":
     air_quality = air_response.json()[0]['Category']['Name']
 
     if air_quality != "Good":
-        suggestions += "Run air filter and keep windows closed. If ventilation needed, try placing filters over windows.\n"
+        suggestions += "Run air filter and keep windows closed. If ventilation is needed, try placing filters over windows.\n"
 
     notification.notify(
         title="Weather Alert",
@@ -42,9 +44,12 @@ if __name__ == "__main__":
             f"Tomorrow's max temp is {maxtemp}F\n" +
             f"Expected air quality: {air_quality}",
         timeout=10
-    )
+        )
 
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
         server.login(config('EMAIL_USER'), config('EMAIL_PASS'))
-        server.sendmail(config('EMAIL_USER'), config('MAIN_EMAIL'), f"Subject: Max Temp: {maxtemp}F Air Quality: {air_quality}\n\n{suggestions}")
+        server.sendmail(
+            config('EMAIL_USER'),
+            config('MAIN_EMAIL'),
+            f"Subject: Max Temp: {maxtemp}F Air Quality: {air_quality}\n\n{suggestions}")
