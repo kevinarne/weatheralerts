@@ -22,7 +22,7 @@ if __name__ == "__main__":
     maxtemp = weather_response.json()['daily'][1]['temp']['max']
 
     suggestions = ""
-    if maxtemp > config('COMFY_TEMP'):
+    if maxtemp > int(config('COMFY_TEMP')):
         suggestions += "Make sure to open the windows and run the fans.\n"
 
     air_response = requests.get(
