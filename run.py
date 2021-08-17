@@ -1,10 +1,10 @@
 import requests
 from decouple import config
-from plyer import notification
 import smtplib
 import ssl
 import datetime
 
+# Port for smtp, used for sending emails
 port = 465
 
 if __name__ == "__main__":
@@ -37,14 +37,6 @@ if __name__ == "__main__":
 
     if air_quality != "Good":
         suggestions += "Run air filter and keep windows closed. If ventilation is needed, try placing filters over windows.\n"
-
-    notification.notify(
-        title="Weather Alert",
-        message=
-            f"Tomorrow's max temp is {maxtemp}F\n" +
-            f"Expected air quality: {air_quality}",
-        timeout=10
-        )
 
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
